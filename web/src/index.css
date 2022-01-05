@@ -11,3 +11,28 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+
+#enterVRButton{
+	position: fixed;
+	border-radius: 2px;
+	background-color: coral;
+	/* top: 0;
+	right: 0; */
+	top: 50%;
+	right: 50%;
+	width: 60px;
+	height: 30px;
+	font-size: 16px;
+	cursor: pointer;
+	z-index: 10;
+	
+}
+
+/* Center text inside div */
+#centered {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
