@@ -26,6 +26,7 @@ var calls = []Call{
 
 func main() {
 	router := gin.Default()
+	router.SetTrustedProxies(nil) // Avoid some unnecessary computation: https://pkg.go.dev/github.com/gin-gonic/gin#section-readme
 	router.GET("/call/:id", getCall)
 	router.POST("/call/:id", startCall)
 	router.GET("/calls", getCalls)
