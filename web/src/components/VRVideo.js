@@ -1,5 +1,7 @@
 import react, { Component } from 'react';
-import * as THREE from 'three';
+import { Scene, Color, PerspectiveCamera, WebGLRenderer,
+DirectionalLight, VideoTexture, PlaneGeometry, MeshLambertMaterial,
+Mesh, Object3D } from 'three';
 
 
 const sizes = {
@@ -16,39 +18,39 @@ export default class VRVideo extends Component {
 	}
 
 	init() {
-		this.scene = new THREE.Scene();
-		this.scene.background = new THREE.Color(0x23a3b4c);
-		this.camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
+		this.scene = new Scene();
+		this.scene.background = new Color(0x23a3b4c);
+		this.camera = new PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 1000);
 		// renderer
-		this.renderer = new THREE.WebGLRenderer({ antialias: true });
+		this.renderer = new WebGLRenderer({ antialias: true });
 		this.renderer.setSize(sizes.width, sizes.height);
 		this.renderer.setPixelRatio(window.devicePixelRatio);
 		this.renderer.setClearColor(0x23a3b4c, 1);
 		document.body.appendChild(this.renderer.domElement);
 
 		// light
-		var light = new THREE.DirectionalLight(0xffffff, 1);
+		var light = new DirectionalLight(0xffffff, 1);
 		light.position.set(1, 1, 1);
 		this.scene.add(light);
 
 		// add plane
 		const video = document.querySelector('#video')
-		const texture = new THREE.VideoTexture(video);
-		const geometry = new THREE.PlaneGeometry(sizes.width / 100, sizes.height / 100);
-		// const geometry = new THREE.PlaneGeometry( 1, 1 );
-		// const geometry = new THREE.BoxGeometry(1, 1, 1)
+		const texture = new VideoTexture(video);
+		const geometry = new PlaneGeometry(sizes.width / 100, sizes.height / 100);
+		// const geometry = new PlaneGeometry( 1, 1 );
+		// const geometry = new BoxGeometry(1, 1, 1)
 		const parameters = { color: 0xffffff, map: texture };
 		// const parameters = { color: 0xffffff};
-		const material = new THREE.MeshLambertMaterial(parameters);
-		this.planeMesh = new THREE.Mesh(geometry, material);
+		const material = new MeshLambertMaterial(parameters);
+		this.planeMesh = new Mesh(geometry, material);
 		this.scene.add(this.planeMesh);
 		// Add box
-		// const geometry = new THREE.BoxGeometry( 1, 1, 1 );
-		// const material = new THREE.MeshLambertMaterial( { color: 0xffffff } );
-		// const mesh = new THREE.Mesh(geometry, material);
+		// const geometry = new BoxGeometry( 1, 1, 1 );
+		// const material = new MeshLambertMaterial( { color: 0xffffff } );
+		// const mesh = new Mesh(geometry, material);
 		// this.scene.add(mesh);
 
-		this.dolly = new THREE.Object3D();
+		this.dolly = new Object3D();
 		this.dolly.add(this.camera);
 		this.scene.add(this.dolly);
 
