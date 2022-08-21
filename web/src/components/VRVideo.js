@@ -1,13 +1,13 @@
-import react, { Component } from 'react';
+import React, { Component } from 'react';
 import { Scene, Color, PerspectiveCamera, WebGLRenderer,
-DirectionalLight, VideoTexture, PlaneGeometry, MeshLambertMaterial,
-Mesh, Object3D } from 'three';
+	DirectionalLight, VideoTexture, PlaneGeometry, MeshLambertMaterial,
+	Mesh, Object3D } from 'three';
 
 
 const sizes = {
 	width: window.innerWidth,
 	height: window.innerHeight
-}
+};
 
 export default class VRVideo extends Component {
 	constructor(props) {
@@ -34,7 +34,7 @@ export default class VRVideo extends Component {
 		this.scene.add(light);
 
 		// add plane
-		const video = document.querySelector('#video')
+		const video = document.querySelector('#video');
 		const texture = new VideoTexture(video);
 		const geometry = new PlaneGeometry(sizes.width / 100, sizes.height / 100);
 		// const geometry = new PlaneGeometry( 1, 1 );
@@ -94,7 +94,7 @@ export default class VRVideo extends Component {
 		});
 		const VRAnimation = () => {
 			this.renderer.render(this.scene, this.camera);
-		}
+		};
 		this.renderer.setAnimationLoop(VRAnimation);
 	}
 
@@ -103,13 +103,13 @@ export default class VRVideo extends Component {
 		navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
 			console.log('Received local stream');
 			video.srcObject = stream;
-		}).catch(e => console.log(e.name + ": " + e.message));
+		}).catch(e => console.log(e.name + ': ' + e.message));
 	}
 
 	render() {
 		return <div id="Render" className="App">
 			<video id="video" autoPlay playsInline> </video>
-		</div>
+		</div>;
 	}
 };
 
