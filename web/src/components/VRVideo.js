@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Scene, Color, PerspectiveCamera, WebGLRenderer,
 	DirectionalLight, VideoTexture, PlaneGeometry, MeshLambertMaterial,
 	Mesh, Object3D } from 'three';
+import StreamReceiver from '../peerConnection/streamReceiver';
+import { useParams } from 'react-router-dom';
 
 
 const sizes = {
@@ -9,12 +11,12 @@ const sizes = {
 	height: window.innerHeight
 };
 
-export default class VRVideo extends Component {
+class VRVideoIntern extends Component {
 	constructor(props) {
 		super(props);
 		this.animate = this.animate.bind(this);
 		this.startVR = this.startVR.bind(this);
-		this.initCall = this.initCall.bind(this);
+		this.initCall = this.startReceiving.bind(this);
 	}
 
 	init() {
@@ -32,24 +34,12 @@ export default class VRVideo extends Component {
 		var light = new DirectionalLight(0xffffff, 1);
 		light.position.set(1, 1, 1);
 		this.scene.add(light);
-
-		// add plane
-		const video = document.querySelector('#video');
-		const texture = new VideoTexture(video);
-		const geometry = new PlaneGeometry(sizes.width / 100, sizes.height / 100);
-		// const geometry = new PlaneGeometry( 1, 1 );
-		// const geometry = new BoxGeometry(1, 1, 1)
-		const parameters = { color: 0xffffff, map: texture };
-		// const parameters = { color: 0xffffff};
-		const material = new MeshLambertMaterial(parameters);
-		this.planeMesh = new Mesh(geometry, material);
-		this.scene.add(this.planeMesh);
 		// Add box
 		// const geometry = new BoxGeometry( 1, 1, 1 );
 		// const material = new MeshLambertMaterial( { color: 0xffffff } );
 		// const mesh = new Mesh(geometry, material);
 		// this.scene.add(mesh);
-
+		
 		this.dolly = new Object3D();
 		this.dolly.add(this.camera);
 		this.scene.add(this.dolly);
@@ -58,16 +48,38 @@ export default class VRVideo extends Component {
 		return this.renderer.domElement;
 	}
 
+	addVideoPlane(){
+		// add plane
+		const video = document.querySelector('#video');
+		video.addEventListener( 'loadedmetadata', _ => {
+			console.log('video.width', video.videoWidth);
+			console.log('video.height', video.videoHeight);
+			const texture = new VideoTexture(video);
+			const height = 7;
+			const width = video.videoWidth * height / video.videoHeight;
+			const geometry = new PlaneGeometry(width, height);
+			const parameters = { color: 0xffffff, map: texture };
+			const material = new MeshLambertMaterial(parameters);
+			this.planeMesh = new Mesh(geometry, material);
+			this.scene.add(this.planeMesh);
+		}, false );
+	}
+
 	animate() {
 		requestAnimationFrame(this.animate);
 		this.renderer.render(this.scene, this.camera);
 	}
 
 	componentDidMount() {
+		this.startReceiving();
 		document.querySelector('#Render').appendChild(this.init());
 		this.animate();
-		this.initCall();
 		this.startVR();
+		// setTimeout(() => { 
+		// 	document.querySelector('#Render').appendChild(this.init());
+		// 	this.animate();
+		// 	this.startVR();
+		//  }, 5000);
 	}
 
 	static getDerivedStateFromError(error) {
@@ -98,12 +110,20 @@ export default class VRVideo extends Component {
 		this.renderer.setAnimationLoop(VRAnimation);
 	}
 
-	initCall() {
+	startReceiving() {
 		const video = document.querySelector('#video');
-		navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(stream => {
-			console.log('Received local stream');
-			video.srcObject = stream;
-		}).catch(e => console.log(e.name + ': ' + e.message));
+		const remoteStream = new MediaStream();
+		video.srcObject = remoteStream;
+		this.streamReceiver = new StreamReceiver(this.props.callId);
+		this.streamReceiver.pc.ontrack = (event) => {
+			console.log('ontrack :>> ', event);
+			event.streams[0].getTracks().forEach((track) => {
+				console.log('gehitzen');
+				remoteStream.addTrack(track);
+			});
+			this.addVideoPlane();
+		};
+		this.streamReceiver.init();
 	}
 
 	render() {
@@ -113,6 +133,12 @@ export default class VRVideo extends Component {
 	}
 };
 
+function VRVideo(props) {
+	const { callId } = useParams();
+	return <VRVideoIntern {...props} callId={callId} />;
+}
+
+export default VRVideo;
 
 // Convert degrees to radians
 function degToRad(degrees) {

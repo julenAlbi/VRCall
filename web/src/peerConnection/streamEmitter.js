@@ -1,7 +1,6 @@
 /**
  * The descriptions are stored in the firebase database.
  */
-import { getRoomId } from '../utils';
 import StorageManager from '../storageManager';
 
 
@@ -27,6 +26,7 @@ export default class StreamEmitter {
 
 		// Push tracks from local stream to peer connection
 		this.stream.getTracks().forEach((track) => {
+			console.log('send track');
 			this.pc.addTrack(track, this.stream);
 		});
 
@@ -35,9 +35,9 @@ export default class StreamEmitter {
 
 		// Get candidates for caller, save to db
 		this.pc.onicecandidate = (event) => {
-			console.log('Ice candidate: ', event.candidate);
 			event.candidate && offerCandidates.add(event.candidate.toJSON());
 		};
+
 		// Create offer
 		const offerDescription = await this.pc.createOffer();
 		await this.pc.setLocalDescription(offerDescription);
@@ -54,6 +54,7 @@ export default class StreamEmitter {
 			const data = snapshot.data();
 			if (!this.pc.currentRemoteDescription && data?.answer) {
 				const answerDescription = new RTCSessionDescription(data.answer);
+				console.log('adding remote description');
 				this.pc.setRemoteDescription(answerDescription);
 			}
 		});
@@ -62,6 +63,7 @@ export default class StreamEmitter {
 		answerCandidates.onSnapshot((snapshot) => {
 			snapshot.docChanges().forEach((change) => {
 				if (change.type === 'added') {
+					console.log('adding candidate');
 					const candidate = new RTCIceCandidate(change.doc.data());
 					this.pc.addIceCandidate(candidate);
 				}
