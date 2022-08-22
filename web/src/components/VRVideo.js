@@ -39,7 +39,7 @@ class VRVideoIntern extends Component {
 		// const material = new MeshLambertMaterial( { color: 0xffffff } );
 		// const mesh = new Mesh(geometry, material);
 		// this.scene.add(mesh);
-		
+
 		this.dolly = new Object3D();
 		this.dolly.add(this.camera);
 		this.scene.add(this.dolly);
