@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import { Scene, Color, PerspectiveCamera, WebGLRenderer,
+import {
+	Scene, Color, PerspectiveCamera, WebGLRenderer,
 	DirectionalLight, VideoTexture, PlaneGeometry, MeshLambertMaterial,
-	Mesh, Object3D } from 'three';
+	Mesh, Object3D
+} from 'three';
 import StreamReceiver from '../peerConnection/streamReceiver';
 import { useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 
 const sizes = {
@@ -34,11 +37,6 @@ class VRVideoIntern extends Component {
 		var light = new DirectionalLight(0xffffff, 1);
 		light.position.set(1, 1, 1);
 		this.scene.add(light);
-		// Add box
-		// const geometry = new BoxGeometry( 1, 1, 1 );
-		// const material = new MeshLambertMaterial( { color: 0xffffff } );
-		// const mesh = new Mesh(geometry, material);
-		// this.scene.add(mesh);
 
 		this.dolly = new Object3D();
 		this.dolly.add(this.camera);
@@ -48,10 +46,10 @@ class VRVideoIntern extends Component {
 		return this.renderer.domElement;
 	}
 
-	addVideoPlane(){
+	addVideoPlane() {
 		// add plane
 		const video = document.querySelector('#video');
-		video.addEventListener( 'loadedmetadata', _ => {
+		video.addEventListener('loadedmetadata', () => {
 			console.log('video.width', video.videoWidth);
 			console.log('video.height', video.videoHeight);
 			const texture = new VideoTexture(video);
@@ -62,7 +60,7 @@ class VRVideoIntern extends Component {
 			const material = new MeshLambertMaterial(parameters);
 			this.planeMesh = new Mesh(geometry, material);
 			this.scene.add(this.planeMesh);
-		}, false );
+		}, false);
 	}
 
 	animate() {
@@ -71,15 +69,14 @@ class VRVideoIntern extends Component {
 	}
 
 	componentDidMount() {
-		this.startReceiving();
-		document.querySelector('#Render').appendChild(this.init());
-		this.animate();
-		this.startVR();
-		// setTimeout(() => { 
+		// XXX: Weird behaviour: The video streaming is not displayed unless error dialog is shown at the beginning and closed
+		// before the timeout code is executed ¯\_(ツ)_/¯, thats why I add a button to start the video call
+		// setTimeout(() => {
+		// 	this.startRecei1ving();
 		// 	document.querySelector('#Render').appendChild(this.init());
 		// 	this.animate();
 		// 	this.startVR();
-		//  }, 5000);
+		// }, 5000);
 	}
 
 	static getDerivedStateFromError(error) {
@@ -126,12 +123,26 @@ class VRVideoIntern extends Component {
 		this.streamReceiver.init();
 	}
 
+	buttonClicked() {
+		console.log('Clicked');
+		this.startReceiving();
+		document.querySelector('#Render').appendChild(this.init());
+		this.animate();
+		this.startVR();
+	}
+
 	render() {
-		return <div id="Render" className="App">
+		return (<><button onClick={() => this.buttonClicked()}>Enter Room</button><div id="Render" className="App">
 			<video id="video" autoPlay playsInline> </video>
-		</div>;
+		</div></>);
 	}
 };
+
+
+VRVideoIntern.propTypes = {
+	callId: PropTypes.string.isRequired,
+};
+
 
 function VRVideo(props) {
 	const { callId } = useParams();

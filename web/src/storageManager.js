@@ -18,18 +18,18 @@ if (!firebase.apps.length) {
 const firestore = firebase.firestore();
 
 export default class StorageManager {
-	constructor(callId) {
+	constructor() {
 		// this.callDoc = firestore.collection('calls').doc(callId);
 		// this.offers = this.callDoc.collection('offers');
 	}
 
-	static createRoom(){
+	static createRoom() {
 		const callDoc = firestore.collection('calls').doc();
-		callDoc.set({ });
+		callDoc.set({});
 		return callDoc.id;
 	}
 
-	static getDocs(callId){
+	static getDocs(callId) {
 		const callDoc = firestore.collection('calls').doc(callId);
 		const offerCandidates = callDoc.collection('offerCandidates');
 		const answerCandidates = callDoc.collection('answerCandidates');

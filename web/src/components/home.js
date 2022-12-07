@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import NereButton from './nereButton';
 import { useNavigate } from 'react-router-dom';
 import StorageManager from '../storageManager';
+import PropTypes from 'prop-types';
 
 
 class HomeIntern extends Component {
@@ -28,6 +29,11 @@ class HomeIntern extends Component {
 		);
 	}
 }
+
+HomeIntern.propTypes = {
+	navigate: PropTypes.func.isRequired
+};
+
 
 function Home(props) {
 	let navigate = useNavigate();

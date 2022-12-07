@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import StreamEmitter from '../peerConnection/streamEmitter';
 import { useParams } from 'react-router-dom';
+import PropTypes from 'prop-types';
 
 
 class EmitterIntern extends Component {
@@ -11,7 +12,7 @@ class EmitterIntern extends Component {
 	}
 
 	componentDidMount() {
-		this.initCall()	;
+		this.initCall();
 	}
 
 	initCall() {
@@ -27,6 +28,12 @@ class EmitterIntern extends Component {
 		return <video id="videoEmitter" autoPlay playsInline></video>;
 	}
 }
+
+
+EmitterIntern.propTypes = {
+	callId: PropTypes.string.isRequired
+};
+
 
 function Emitter(props) {
 	const { callId } = useParams();
