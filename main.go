@@ -6,25 +6,32 @@ import (
 
 var idCounter = 4
 
+type Answer struct {
+}
+
+var calls map[string]Call
+
 type Call struct {
-	Id      string `json:"id"`
-	Desc    string `json:"desc"`
-	URLName string `json:"urlName"`
-	OnCall  bool   `json:"onCall"`
+	answer           Description
+	offer            Description
+	answerCandidates map[string]Candidate
+	offerCandidates  map[string]Candidate
 }
 
-type CallRequest struct {
-	URLName string `json:"urlName"`
-	Desc    string `json:"desc"`
+type Description struct {
+	sdp   string
+	typee string
 }
 
-var calls = []Call{
-	{"1", "Call 1", "iepa", false},
-	{"2", "Call 2", "iepa", false},
-	{"3", "Call 3", "iepa", true},
+type Candidate struct {
+	candidate     string
+	sdpMLineIndex int
+	sdpMid        string
 }
 
 func main() {
+	calls = make(map[string]Call)
+
 	router := gin.Default()
 	router.SetTrustedProxies(nil) // Avoid some unnecessary computation: https://pkg.go.dev/github.com/gin-gonic/gin#section-readme
 	router.GET("/call/:id", getCall)
