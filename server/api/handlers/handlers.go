@@ -109,6 +109,17 @@ func getAnswerCandidates(w http.ResponseWriter, r *http.Request) {
 	render.JSON(w, r, call.AnswerCandidates)
 }
 
+// Set answer description handler
+func setAnswerDescription(w http.ResponseWriter, r *http.Request) {
+	call := r.Context().Value("call").(*models.Call)
+	des := &models.Description{}
+	if err := render.Bind(r, des); err != nil {
+		render.Render(w, r, ErrNotFound)
+		return
+	}
+	call.Answer = *des
+}
+
 func callCtx(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var call *models.Call
@@ -126,7 +137,6 @@ func callCtx(next http.Handler) http.Handler {
 		}
 
 		ctx := context.WithValue(r.Context(), "call", call)
-		fmt.Printf("On calCtx: %p\n", call)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
